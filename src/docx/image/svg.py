@@ -54,7 +54,6 @@ class Svg(BaseImageHeader):
         stream.seek(0)
         data = stream.read()
         root = ET.fromstring(data)
-        # FIXME: The width could be expressed as '4cm'
         # See https://www.w3.org/TR/SVG11/struct.html#NewDocument
         width = cls._parse_svg_dims(root.attrib["width"])
         height = cls._parse_svg_dims(root.attrib["height"])
