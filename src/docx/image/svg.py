@@ -34,12 +34,28 @@ class Svg(BaseImageHeader):
         return "svg"
 
     @classmethod
+    def _parse_svg_dims(cls, value):
+        svg_dims_dict = {
+            'px': 1,
+            'cm': 37.7952755906,
+            'pt': 1 / 0.75,
+            'in': 96,
+            'mm': 3.77952755906,
+        }
+        try:
+            return int(value)
+        except ValueError:
+            for unit, factor in svg_dims_dict.items():
+                if value.endswith(unit):
+                    return int(float(value[:-len(unit)]) * factor)
+            
+    @classmethod
     def _dimensions_from_stream(cls, stream):
         stream.seek(0)
         data = stream.read()
         root = ET.fromstring(data)
         # FIXME: The width could be expressed as '4cm'
         # See https://www.w3.org/TR/SVG11/struct.html#NewDocument
-        width = int(root.attrib["width"])
-        height = int(root.attrib["height"])
+        width = cls._parse_svg_dims(root.attrib["width"])
+        height = cls._parse_svg_dims(root.attrib["height"])
         return width, height
